@@ -263,3 +263,53 @@ Amplitude dashboard.
 - **Simulator** (with temporary Amplitude debug logging, removed afterwards): Amplitude confirmed
   `joke_liked` and `joke_unliked` with the joke text (e.g. "What's the best time to go to the dentist?" /
   "Tooth hurty.") and `shows_sorted { sort_by: "seats" }`, with no warnings or errors.
+
+---
+
+## Task 4 — README and findings
+
+**Date:** 2026-09-28 · **Tool:** Claude Code (Opus 5.5)
+
+**Prompt:**
+
+> TASK 4
+>
+> implement short and README file how to run and build app on local environment
+>
+> also fill findings with what was changed
+>
+> 1) RN cli - > Expo
+> 2) scroll view - > legend list
+> 3) split the code into modern architecture folder, add the layers
+> 4) connect real backend api
+> 5) add misset event tracking (users/liked jokes etc)
+> 6) check capacity of rooms, validation
+> 7) keep the data between the session using mmkv
+>
+> for now this
+
+(Follow-up during the task: "do not run any script". All work stopped at that point; the rest was
+done by editing files only.)
+
+**Summary of what was implemented:**
+
+- `README.md` (was empty):
+  - Requirements, and why a development build is needed (Expo Go won't work).
+  - `.env.local` setup.
+  - Running with `npm run ios` / `npm start`, the Release build command, and `npm run check`.
+  - A short project structure and notes (Expo 57.0.4 pin, fake shows backend, how to reset local data).
+- `FINDINGS.md` (was empty): the 7 points, each as "Before" (the problem in `reference/`) and "Now".
+  It also covers bugs found in the reference code:
+  - The `setInterval` was never cleared.
+  - A FlatList was nested in a ScrollView, with index keys.
+  - "Book now" skipped validation.
+  - The user's name and email were sent to analytics.
+  - The hardcoded joke; seats left never changed.
+- It says plainly that shows/bookings still use a fake MMKV-backed server and only jokes use a real API.
+- **Checks:** `npm run check` ✅ (run before the "do not run any script" message).
+
+**Not verified:** the local Release build (`npx expo run:ios --configuration Release`).
+- The first attempt failed compiling react-native-svg: `glog/logging.h` and `folly/Range.h` were not found.
+- A retry failed with "build database is locked" (another build was running at the same time).
+- No further runs after the user asked not to run scripts. The README marks this command as not verified.
+- No code changed in this task, so the Debug app is the same one tested in Task 3.1.
