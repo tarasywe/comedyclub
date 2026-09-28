@@ -1,0 +1,22 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "verbatimModuleSyntax": false,
+    "noUncheckedIndexedAccess": false,
+    "types": ["jest", "node"],
+    "paths": {
+      "@/lib/*": ["./src/lib/*"],
+      "@/components/shared/*": ["./src/components/shared/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/config/*": ["./src/config/*"],
+      "@/stores/*": ["./src/stores/*"],
+      "@/theme/*": ["./src/theme/*"],
+      "@/assets/*": ["./assets/*"],
+      "@features/*": ["./src/features/*"],
+      "@ui/*": ["./src/components/ui/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
+  "exclude": ["node_modules", "reference"]
+}
