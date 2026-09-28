@@ -4,6 +4,7 @@ import { ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
+import { useAnalyticsStart } from '@/lib/analytics/use-analytics-start';
 import '@/lib/query/online-manager';
 import { queryClient } from '@/lib/query/query-client';
 import { useAppStateFocus } from '@/lib/query/use-app-state-focus';
@@ -15,6 +16,7 @@ type AppProvidersProps = {
 
 export function AppProviders({ children }: AppProvidersProps) {
   useAppStateFocus();
+  useAnalyticsStart();
 
   return (
     <QueryClientProvider client={queryClient}>

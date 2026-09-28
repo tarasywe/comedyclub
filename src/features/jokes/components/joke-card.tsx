@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { useJokeCard } from '../hooks/use-joke-card';
+import { JokeLikeButton } from './joke-like-button';
 import { styles } from './joke-card.styles';
 
 export function JokeCard() {
@@ -19,6 +20,7 @@ export function JokeCard() {
         </Animated.View>
       ) : null}
       <View style={styles.footer}>
+        <JokeLikeButton joke={joke} source="joke_card" />
         <Pressable
           accessibilityRole="button"
           disabled={isRefreshing}

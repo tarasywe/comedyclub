@@ -14,7 +14,9 @@ react-native-web (required on native by gluestack v5's react-aria dependency)
 · @react-native-community/netinfo (connectivity) · @tanstack/react-query-persist-client +
 @tanstack/query-sync-storage-persister · react-native-mmkv 4 + react-native-nitro-modules
 (local key-value storage; the fake shows server keeps bookings here) · @expo/vector-icons
-(font icons, Ionicons)
+(font icons, Ionicons / MaterialCommunityIcons) · @amplitude/analytics-react-native (analytics;
+key `EXPO_PUBLIC_AMPLITUDE_KEY` in .env.local) + @react-native-async-storage/async-storage 2.2.0
+(Amplitude's storage; pinned in `overrides` so only one native copy exists)
 
 Tooling (devDeps): TypeScript 6.0.3 · ESLint 9 + eslint-config-expo (flat config) · @types/jest ·
 @types/react. Checks: `npm run lint`, `npm run typecheck`, `npm run check` (both).

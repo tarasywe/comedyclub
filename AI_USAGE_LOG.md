@@ -149,3 +149,117 @@ React Query / persister wiring, `GestureHandlerRootView`, Android run, unit test
 
 **Not verified in the UI:** replacing the digit with a larger one (the simulator tool can't send
 backspace or select text); that path was checked in Node only.
+
+---
+
+## Task 3 — Amplitude analytics, liked jokes, favorite shows, filter & sort
+
+**Date:** 2026-09-28 · **Tool:** Claude Code (Opus 5.5)
+
+**Prompt:**
+
+> TASK 3
+>
+> Integrate app with @amplitude/analytics-react-native
+> the api key is located in .env.local
+>
+> when app is starting generate unique user identifier to set user id in analytics servce
+> in reference folder there is already analytics helpers, use them also set the user on start
+>
+> ```ts
+> import { setUserId } from '@amplitude/analytics-react-native';
+>
+> // Set a unique identifier for the current user
+> setUserId('user_123456');
+> ```
+>
+> so we can track ticket purchasing with another session events, like time in app, visiting rooms etc.
+>
+> i header menu add 'smile' icon that cry and smile, and add that icon on card with joke. when user press on that emogy (put it besides the next button), the joke is saving to local stogare. then, when user press on button in header he is navigating to new screen with liked jokes. implement list of the jokes using legendary list. add 'unlike' button, so it will remove from storage. the newest jokes on top
+>
+> also add 'start' icons to the rooms. when user starred room, it should keep as well in storage. when user navigate to the room he can see star on top, pressing on icon the room becomes 'unstarred'
+> add filter option on home screen. if user press on star besides near the title 'upcoming shows', the list is filtering and only favorite rooms is visible. impelemt 'onmount' and 'onmount' animation so when count of lines changed, user can see some sliding down and up of rows.
+>
+> the events to track
+> 1) user is open app (first time set user id)
+> 2) user is reques new joke
+> 3) user like or unlike the joke
+> 4) user request manula refresh
+> 5) user favorite or unfavorite the room
+> 6) user books the sits
+
+**Follow-up prompt (same task):**
+
+> i missed to add sorting option. the rooms shouuld be sorted by date or fewest seets. implement the button with calendar icon or with chair.
+
+**Summary of what was implemented:**
+
+- **Env file:** the key was in `env.local` (no leading dot). It was renamed to `.env.local`, because Expo
+  only auto-loads `.env.local` and only that name is gitignored. Variable: `EXPO_PUBLIC_AMPLITUDE_KEY`,
+  read in `src/config/env.ts`.
+- **New dependencies** (exact, in CLAUDE.md Stack): `@amplitude/analytics-react-native@1.10.2`,
+  `@react-native-async-storage/async-storage@2.2.0` (Expo's bundled version; also pinned in
+  `overrides` so Amplitude doesn't pull a second native copy). Expo pins verified unchanged.
+- **Analytics layer (`src/lib/analytics`)**
+  - `analytics.ts`: `initAnalytics(userId)` runs `amplitude.init` with `trackingSessionEvents: true`
+    (session_start/end give time in app) and then `setUserId`. `trackEvent(name, props)` is typed
+    against `events.ts`. If the key is missing, analytics is off and a warning is logged.
+  - `user-id.ts`: generates a UUID-v4 style id on the first launch, stores it in MMKV, and reuses it
+    so every session maps to the same user.
+  - `use-analytics-start.ts`: called once in `AppProviders`. Sets the user and tracks `app_opened { first_open }`.
+- **Events** (reference names kept where they existed; no names or emails are sent):
+  `app_opened`, `joke_refreshed` (New joke button), `joke_liked` / `joke_unliked` (source: card or list),
+  `shows_refreshed` (pull-to-refresh), `show_favorited` / `show_unfavorited` (source: list or details),
+  `booking_submitted { show_id, quantity }`, plus `show_viewed { show_id }` for "visiting rooms".
+- **Client state in Zustand + MMKV:** `src/lib/storage/zustand-storage.ts` (persist adapter).
+  `features/jokes/store.ts` (liked jokes, newest first) and `features/shows/store.ts` (favorite show ids).
+- **Liked jokes:** `emoticon-lol` icon (face with tears of joy) next to "New joke" to like/unlike,
+  header button with a count badge → new `/liked-jokes` route (`links.likedJokes`). `LikedJokesScreen`
+  uses `AnimatedLegendList` with an "Unlike" button per row. All logic is in hooks
+  (`use-joke-like`, `use-liked-jokes`, `use-liked-jokes-button`).
+- **Favorite shows:** a star on every row, and a star in the details header (`Stack.Screen` `headerRight`) that
+  toggles it. Logic in `use-favorite-show`.
+- **Filter & sort on Home:** buttons next to the title. Star = only favorites (title becomes
+  "Favorite shows"). Calendar/seat icon = sort by date / fewest seats (ties stay in date order,
+  `utils/sort-shows.ts`). State lives in `use-show-list`.
+- **Animations:** rows fade in/out on mount/unmount (Reanimated `entering`/`exiting`), and remaining rows
+  slide to their new position (`itemLayoutAnimation={LinearTransition}`) when filtering, sorting or
+  unliking. `recycleItems={false}` so rows remount and the animations play.
+- **Checks:** `npm run lint` ✅, `npm run typecheck` ✅.
+- **Simulator run** (iPhone 17 Pro): `pod install` + `expo run:ios` — build succeeded. Verified:
+  - Liking a joke fills the icon and updates the header badge.
+  - The liked-jokes screen lists the newest first, and Unlike fades the row out while the next one slides up.
+  - Starring from a row and unstarring from the details header both work.
+  - The favorites filter and the date/seats sort work, with rows sliding.
+  - Liked jokes and stars survive a cold restart.
+  - With temporary debug logging (since removed), Amplitude confirmed delivery ("Event tracked successfully",
+    `success` response) for `app_opened { first_open: false }`, `joke_refreshed`, `joke_liked`, `show_favorited`.
+
+**Not verified end-to-end:** that `joke_unliked`, `show_unfavorited`, `show_viewed`, `shows_refreshed`
+and `booking_submitted` reach Amplitude (same `trackEvent` path, but debug logging was off when they
+fired), and `first_open: true` (the id already existed on this simulator). Nothing was checked in the
+Amplitude dashboard.
+
+---
+
+## Task 3.1 — Track sort changes, joke text in like/unlike events
+
+**Date:** 2026-09-28 · **Tool:** Claude Code (Opus 5.5)
+
+**Prompt:**
+
+> add also track when user change sorting option. also when we try liked/unliked joke add test to information
+
+(Read "add test to information" as: add the joke text to the event properties.)
+
+**Summary of what was implemented:**
+
+- New event `shows_sorted { sort_by: 'date' | 'seats' }`, tracked in `use-show-list.ts` when the
+  calendar/seat button toggles the sort.
+- `joke_liked` / `joke_unliked` now carry `joke_setup` and `joke_punchline` next to `joke_id` and
+  `source`, built by `features/jokes/utils/joke-event-properties.ts`. The liked-jokes list's Unlike
+  now passes the whole joke (not just the id) so the text is available there too.
+- **Checks:** `npm run lint` ✅, `npm run typecheck` ✅.
+- **Simulator** (with temporary Amplitude debug logging, removed afterwards): Amplitude confirmed
+  `joke_liked` and `joke_unliked` with the joke text (e.g. "What's the best time to go to the dentist?" /
+  "Tooth hurty.") and `shows_sorted { sort_by: "seats" }`, with no warnings or errors.

@@ -29,7 +29,13 @@ export const styles = StyleSheet.create({
     marginTop: 8,
   },
   status: { color: colors.muted, fontSize: 16 },
-  footer: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
   refresh: {
     backgroundColor: colors.accent,
     borderRadius: 14,

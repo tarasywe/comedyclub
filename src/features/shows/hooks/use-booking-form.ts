@@ -1,6 +1,8 @@
 import { startTransition, useActionState, useState } from 'react';
 import { z } from 'zod';
 
+import { trackEvent } from '@/lib/analytics/analytics';
+
 import { useBookTicketsMutation } from '../api/mutations';
 import {
   createBookingFormSchema,
@@ -42,6 +44,7 @@ export function useBookingForm(showId: string, seatsLeft: number) {
       }
       try {
         const booking = await bookTickets({ showId, ...parsed.data });
+        trackEvent('booking_submitted', { show_id: showId, quantity: booking.quantity });
         setValues(INITIAL_VALUES);
         return { status: 'success', booking };
       } catch (error) {

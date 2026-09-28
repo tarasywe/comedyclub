@@ -1,10 +1,11 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { formatShowDate } from '@/utils/format-show-date';
 
 import { BookingForm } from '../components/booking-form';
+import { FavoriteShowButton } from '../components/favorite-show-button';
 import { TicketCard } from '../components/ticket-card';
 import { useShowDetails } from '../hooks/use-show-details';
 import { isLowOnSeats, seatsLabel } from '../utils/seats';
@@ -24,6 +25,11 @@ export function ShowDetailsScreen() {
       bottomOffset={16}
       keyboardShouldPersistTaps="handled"
     >
+      <Stack.Screen
+        options={{
+          headerRight: () => <FavoriteShowButton showId={show.id} source="show_details" size={26} />,
+        }}
+      />
       <View style={styles.details}>
         <Text style={styles.title}>{show.headliner}</Text>
         <Text style={styles.meta}>

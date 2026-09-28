@@ -1,3 +1,5 @@
+import { trackEvent } from '@/lib/analytics/analytics';
+
 import { useRandomJokeQuery } from '../api/queries';
 import { useJokeCardAnimation } from './use-joke-card-animation';
 
@@ -12,6 +14,9 @@ export function useJokeCard() {
     // Only surface the error when there is no joke to show at all.
     isError: isError && !joke,
     isRefreshing: isFetching,
-    refresh: () => refetch(),
+    refresh: () => {
+      trackEvent('joke_refreshed', { source: 'button' });
+      refetch();
+    },
   };
 }
