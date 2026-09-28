@@ -1,3 +1,3 @@
-import { ShowDetailsScreen } from '@features/show-details';
+import { ShowDetailsScreen } from '@features/shows';
 
 export default ShowDetailsScreen;

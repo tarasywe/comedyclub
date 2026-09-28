@@ -12,7 +12,9 @@ UI & interaction: react-native-gesture-handler · react-native-reanimated ·
 react-native-web (required on native by gluestack v5's react-aria dependency)
 · @legendapp/list
 · @react-native-community/netinfo (connectivity) · @tanstack/react-query-persist-client +
-@tanstack/query-sync-storage-persister
+@tanstack/query-sync-storage-persister · react-native-mmkv 4 + react-native-nitro-modules
+(local key-value storage; the fake shows server keeps bookings here) · @expo/vector-icons
+(font icons, Ionicons)
 
 Tooling (devDeps): TypeScript 6.0.3 · ESLint 9 + eslint-config-expo (flat config) · @types/jest ·
 @types/react. Checks: `npm run lint`, `npm run typecheck`, `npm run check` (both).

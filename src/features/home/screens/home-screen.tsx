@@ -1,13 +1,17 @@
-import { Link } from 'expo-router';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 
-import { links } from '@/config/links';
+import { JokeCard } from '@features/jokes';
+import { ShowList } from '@features/shows';
+
+import { styles } from './home-screen.styles';
 
 export function HomeScreen() {
   return (
-    <View>
-      <Text>Home</Text>
-      <Link href={links.showDetails('1')}>Open show details</Link>
+    <View style={styles.root}>
+      <View style={styles.joke}>
+        <JokeCard />
+      </View>
+      <ShowList />
     </View>
   );
 }
